@@ -1,0 +1,88 @@
+// components/LogoutButton.js
+'use client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { toastrSuccess, toastrError } from '../../../../components/ui/toaster/toaster';
+
+export default function LogoutButton() {
+  const router = useRouter();
+  const [showModal, setShowModal] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch('http://localhost:8001/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      const text = await res.text();
+      let data;
+
+      try {
+        data = JSON.parse(text);
+      } catch (err) {
+        console.error('Failed to parse JSON. Response:', text);
+        return toastrError('Server returned invalid response');
+      }
+
+      if (!res.ok) {
+        console.error('Logout error:', data);
+        return toastrError(data.error || 'Logout failed');
+      }
+
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userEmail');
+
+     
+      router.push('/login');
+    } catch (err) {
+      console.error('Network or fetch error:', err);
+      toastrError('Network error');
+    }
+  };
+
+  return (
+    <>
+      <button
+        onClick={() => setShowModal(true)}
+        className="
+          px-6 py-3
+          font-semibold text-white
+          bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500
+          rounded-2xl
+          shadow-lg
+          transition-transform transform hover:scale-105 hover:shadow-2xl
+          active:scale-95
+          focus:outline-none focus:ring-4 focus:ring-pink-300
+        "
+      >
+        Logout
+      </button>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-2xl shadow-xl w-80 text-center">
+            <h2 className="text-lg font-bold mb-4">Confirm Logout</h2>
+            <p className="mb-6">Are you sure you want to logout?</p>
+            <div className="flex justify-around">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
