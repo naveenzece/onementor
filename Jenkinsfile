@@ -25,7 +25,7 @@ pipeline {
                 script {
                     echo 'Building Docker image...'
                     sh '''
-                        docker build -f Dockerfile.prod -t ${DOCKER_IMAGE} -t ${LATEST_IMAGE} .
+                        docker build -f Dockerfile -t ${DOCKER_IMAGE} -t ${LATEST_IMAGE} .
                     '''
                 }
             }
