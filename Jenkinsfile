@@ -25,8 +25,11 @@ pipeline {
                 script {
                     echo 'Building Docker image...'
                     sh '''
-                        docker build -f ui/Dockerfile -t 910655918757.dkr.ecr.ap-south-1.amazonaws.com/onementor-ui:6 \
-            -t 910655918757.dkr.ecr.ap-south-1.amazonaws.com/onementor-ui:latest ui/ .
+                        docker build -f ui/Dockerfile \
+    -t 910655918757.dkr.ecr.ap-south-1.amazonaws.com/onementor-ui:${BUILD_NUMBER} \
+    -t 910655918757.dkr.ecr.ap-south-1.amazonaws.com/onementor-ui:latest \
+    ui/
+
                     '''
                 }
             }
