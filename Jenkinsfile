@@ -25,7 +25,8 @@ pipeline {
                 script {
                     echo 'Building Docker image...'
                     sh '''
-                        docker build -f Dockerfile -t ${DOCKER_IMAGE} -t ${LATEST_IMAGE} .
+                        docker build -f ui/Dockerfile -t 910655918757.dkr.ecr.ap-south-1.amazonaws.com/onementor-ui:6 \
+            -t 910655918757.dkr.ecr.ap-south-1.amazonaws.com/onementor-ui:latest ui/ .
                     '''
                 }
             }
