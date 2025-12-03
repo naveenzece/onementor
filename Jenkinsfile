@@ -2,10 +2,10 @@ pipeline {
     agent any
     
     environment {
-        AWS_REGION = 'ap-south-1'  // Update with your AWS region
+        AWS_REGION = 'ap-south-2'  // Update with your AWS region
         AWS_ACCOUNT_ID = '910655918757'  // Update with your AWS account ID
         ECR_REPOSITORY = 'onementor-ui'
-        EKS_CLUSTER_NAME = 'onementor-cluster'  // Update with your EKS cluster name
+        EKS_CLUSTER_NAME = 'onementor-cluster1'  // Update with your EKS cluster name
         KUBECTL_VERSION = '1.34.2'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
         DOCKER_IMAGE = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}"
@@ -26,8 +26,8 @@ pipeline {
                     echo 'Building Docker image...'
                     sh '''
                         docker build -f ui/Dockerfile \
-    -t 910655918757.dkr.ecr.ap-south-1.amazonaws.com/onementor-ui:${BUILD_NUMBER} \
-    -t 910655918757.dkr.ecr.ap-south-1.amazonaws.com/onementor-ui:latest \
+    -t 910655918757.dkr.ecr.ap-south-2.amazonaws.com/onementor-ui:${BUILD_NUMBER} \
+    -t 910655918757.dkr.ecr.ap-south-2.amazonaws.com/onementor-ui:latest \
     ui/
 
                     '''
