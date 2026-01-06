@@ -6,8 +6,18 @@ pipeline {
     }
 
     stages {
-        stage('Install UI Dependencies') {
+
+        stage('Checkout') {
             steps {
+                checkout scm
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                dir('api') {
+                    sh 'npm install'
+                }
                 dir('ui') {
                     sh 'npm install'
                 }
@@ -24,18 +34,21 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'pm2 startOrReload ecosystem.config.js'
-                sh 'pm2 save'
+                sh '''
+                  pm2 startOrRestart $WORKSPACE/ecosystem.config.js
+                  pm2 save
+                  pm2 list
+                '''
             }
         }
     }
 
     post {
         success {
-            echo 'Deployment successful!'
+            echo '✅ Application successfully deployed.'
         }
         failure {
-            echo 'Deployment failed.'
+            echo '❌ Deployment failed.'
         }
     }
 }
