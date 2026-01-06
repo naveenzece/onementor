@@ -15,9 +15,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                dir('api') {
-                    sh 'npm install'
-                }
+                sh 'npm install'
                 dir('ui') {
                     sh 'npm install'
                 }
