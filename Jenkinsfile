@@ -14,15 +14,18 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            parallel {
-                stage('API Install') {
-                    steps {
-                        dir('api') {
-                            sh 'npm install'
-                        }
-                    }
+    stage('Install Dependencies') {
+        parallel {
+            stage('UI Install') {
+                steps {
+                    dir('ui') {
+                        sh 'npm install'
+                    }    
                 }
+            }
+        }
+    }
+
                 stage('UI Install') {
                     steps {
                         dir('ui') {
