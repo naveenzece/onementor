@@ -7,6 +7,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -14,24 +15,11 @@ pipeline {
             }
         }
 
-    stage('Install Dependencies') {
-        parallel {
-            stage('UI Install') {
-                steps {
-                    dir('ui') {
-                        sh 'npm install'
-                    }    
-                }
-            }
-        }
-    }
-
-                stage('UI Install') {
-                    steps {
-                        dir('ui') {
-                            sh 'npm install'
-                        }
-                    }
+        // Install only UI dependencies (API folder is not a Node project)
+        stage('Install UI Dependencies') {
+            steps {
+                dir('ui') {
+                    sh 'npm install'
                 }
             }
         }
@@ -47,19 +35,19 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Install PM2 globally
+                    echo "Installing PM2..."
                     sh 'npm install -g pm2 --unsafe-perm=true'
 
-                    // Stop existing apps if running
+                    echo "Stopping old PM2 processes..."
                     sh 'pm2 delete onementor-api onementor-ui || true'
 
-                    // Start or reload ecosystem
+                    echo "Starting applications with PM2..."
                     sh 'pm2 startOrReload ecosystem.config.js --update-env'
 
-                    // Save PM2 process list
+                    echo "Saving PM2 process list..."
                     sh 'pm2 save'
 
-                    // Enable PM2 startup on reboot
+                    echo "Configuring PM2 startup..."
                     sh 'pm2 startup | tail -1 | sudo bash || true'
                 }
             }
@@ -68,9 +56,16 @@ pipeline {
         stage('Configure Nginx') {
             steps {
                 script {
+                    echo "Copying Nginx config..."
                     sh 'sudo cp nginx/onementor.conf /etc/nginx/sites-available/onementor.conf'
+
+                    echo "Enabling site..."
                     sh 'sudo ln -sf /etc/nginx/sites-available/onementor.conf /etc/nginx/sites-enabled/onementor.conf'
+
+                    echo "Testing Nginx config..."
                     sh 'sudo nginx -t'
+
+                    echo "Reloading Nginx..."
                     sh 'sudo systemctl reload nginx'
                 }
             }
@@ -80,12 +75,11 @@ pipeline {
     post {
         success {
             echo '✅ Deployment successful!'
-            echo 'API is running'
-            echo 'UI is running'
-            echo 'Both are accessible via Nginx'
+            echo 'UI built and deployed'
+            echo 'PM2 and Nginx configured successfully'
         }
         failure {
-            echo '❌ Deployment failed. Check the logs above for details.'
+            echo '❌ Deployment failed. Check logs above.'
         }
         always {
             echo 'Build completed.'
